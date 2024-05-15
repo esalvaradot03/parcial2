@@ -13,28 +13,35 @@ export class ListComponent implements OnInit {
   selected: Boolean = false;
   selectedPais!: Pais;
 
+ 
   paises: Array<PaisDetail> = [];
+  paisMasAntiguo: PaisDetail | undefined;
 
   constructor(private paisesService: PaisesService) { }
 
   getPaises(): void {
-    this.paisesService.getPaises().subscribe(a => {this.paises = a});
-
+    this.paisesService.getPaises().subscribe(a => {
+      this.paises = a;
+      this.paisMasAntiguo = this.calcularPaisMasAntiguo();
+    });
   }
 
   ngOnInit() {
     this.getPaises();
   }
-  
-  getpaisviejo(): number {
-    let paisviejo = this.paises[0];
-    for (let i = 1; i < this.paises.length; i++) {
-      if (parseInt(this.paises[i].formation_year) < parseInt(paisviejo.formation_year)) {
-        paisviejo = this.paises[i];
+
+  calcularPaisMasAntiguo(): PaisDetail | undefined {
+    let paisMasAntiguo: PaisDetail | undefined;
+
+    for (let pais of this.paises) {
+      if (!paisMasAntiguo || pais.formation_year < paisMasAntiguo.formation_year) {
+        paisMasAntiguo = pais;
       }
     }
-    return paisviejo.id;
+
+    return paisMasAntiguo;
   }
+
 
   
   onSelected(pais: PaisDetail): void {
